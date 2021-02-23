@@ -1,0 +1,21 @@
+version: "3.7"
+
+services:
+  proxy:
+    image: "alpine/socat:latest"
+    expose:
+      - "13505"
+    command:
+      - "tcp-listen:13505,fork,reuseaddr"
+      - "tcp-connect:sourceaddress:13505"
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile.dev
+    ports:
+      - "13500:8000"
+    volumes:
+      - "./api/api:/app/api"
+    environment:
+      - "APISOURCE=proxy:13505"

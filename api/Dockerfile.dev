@@ -1,0 +1,17 @@
+FROM python:3.9-slim-buster
+
+RUN apt-get update && \
+    apt-get dist-upgrade -y && \
+    apt-get install -y --no-install-recommends build-essential
+
+RUN pip install poetry
+
+WORKDIR /app
+
+COPY ./poetry.lock ./pyproject.toml ./
+
+RUN poetry install
+
+COPY . ./
+
+CMD ["poetry", "run", "uvicorn", "api.main:app", "--reload", "--host", "0.0.0.0"]

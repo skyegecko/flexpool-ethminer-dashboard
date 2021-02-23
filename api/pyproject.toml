@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "api"
+version = "0.1.0"
+description = ""
+authors = ["Jan-Willem van der Sijp <gecko-git@parseq.co.uk>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+fastapi = "^0.63.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+fastapi = {extras = ["all"], version = "^0.63.0"}
+mypy = "^0.812"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[pycodestyle]
+max-line-length=88
