@@ -49,11 +49,14 @@ class Source:
         writer.write(json_payload.encode())
         await writer.drain()
 
-        result_b = await asyncio.wait_for(reader.readline(), timeout=30)
-        result = result_b.decode()
-        LOGGER.debug("read: %s", result.strip())
+        response_b = await asyncio.wait_for(reader.readline(), timeout=30)
+        response = response_b.decode()
+        LOGGER.debug("read: %s", response.strip())
 
         writer.close()
         await writer.wait_closed()
 
-        return json.loads(result)
+        result = json.loads(response)
+        result = {k: v for k, v in result.items() if k not in ("id", "jsonrpc")}
+
+        return result
