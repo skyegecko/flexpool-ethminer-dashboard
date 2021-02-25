@@ -28,9 +28,8 @@ class _Settings:
     def __init__(self) -> None:
         self.keys_and_defaults: Dict[str, _KeyRelation] = {
             "api_root_path": _KeyRelation("API_ROOT_PATH", "", self.noop_validator),
-            "source_address": _KeyRelation(
-                "APISOURCE", "", self.source_address_validator
-            ),
+            "source_address": _KeyRelation("APISOURCE_ADDR", "", self.noop_validator),
+            "source_port": _KeyRelation("APISOURCE_PORT", "0", self.str_to_int),
             "connection_timeout": _KeyRelation(
                 "CONNECTION_TIMEOUT", "5", self.str_to_int
             ),
@@ -94,18 +93,6 @@ class _Settings:
                 val,
             )
             raise ValueError("Could not parse value to integer")
-
-    def source_address_validator(self, key: str, val: str) -> str:
-        addr = self.env["source_address"]
-        if not addr or not re.match(r"^.+:[0-9]+", addr):
-            LOGGER.critical(
-                "Could not parse API Source connection "
-                "address in variable %s with value %s",
-                self.keys_and_defaults["source_address"][0],
-                addr,
-            )
-            raise ValueError("Could not parse API Source connection address")
-        return addr
 
 
 _settings = _Settings()

@@ -5,10 +5,11 @@ the source data for this API.
 import asyncio
 import json
 import logging
-import os
 import random
 
 from typing import Optional
+
+import api.settings
 
 LOGGER = logging.getLogger(__name__)
 
@@ -19,8 +20,8 @@ class Source:
     """
 
     def __init__(self):
-        self.address, _, self.port = os.getenv("APISOURCE").partition(":")
-        LOGGER.info("Using connection to %s:%s", self.address, self.port)
+        self.address = api.settings.source_address
+        self.port = api.settings.source_port
 
     @classmethod
     def generate_id(cls) -> int:
