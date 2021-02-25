@@ -18,4 +18,5 @@ services:
     volumes:
       - "./api/api:/app/api"
     environment:
-      - "APISOURCE=proxy:13505"
+      - "APISOURCE_ADDR=proxy"
+      - "APISOURCE_PORT=13505"

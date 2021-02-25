@@ -5,19 +5,13 @@ Import settings from environment variables
 import logging
 import os
 import pprint
-import re
-from typing import Callable, Dict, NamedTuple, Union
+import typing
+from typing import Callable, Optional, TypeVar
 
 LOGGER = logging.getLogger(__name__)
 
-
-SettingsUnion = Union[bool, int, str]
-
-
-class _KeyRelation(NamedTuple):
-    envvar: str
-    default: str
-    validator: Callable[[str, str], SettingsUnion]
+T = TypeVar("T", bool, int, str)
+ValidatorCallable = Callable[[str, str], T]
 
 
 class _Settings:
@@ -26,50 +20,17 @@ class _Settings:
     """
 
     def __init__(self) -> None:
-        self.keys_and_defaults: Dict[str, _KeyRelation] = {
-            "api_root_path": _KeyRelation("API_ROOT_PATH", "", self.noop_validator),
-            "source_address": _KeyRelation("APISOURCE_ADDR", "", self.noop_validator),
-            "source_port": _KeyRelation("APISOURCE_PORT", "0", self.str_to_int),
-            "connection_timeout": _KeyRelation(
-                "CONNECTION_TIMEOUT", "5", self.str_to_int
-            ),
-            "connection_keepalive": _KeyRelation(
-                "CONNECTION_KEEPALIVE", "30", self.str_to_int
-            ),
-            "show_username": _KeyRelation("SHOW_USERNAME", "false", self.str_to_bool),
-            "show_password": _KeyRelation("SHOW_PASSWORD", "false", self.str_to_bool),
-            "show_workername": _KeyRelation(
-                "SHOW_WORKERNAME", "false", self.str_to_bool
-            ),
-            "show_pathcomponent": _KeyRelation(
-                "SHOW_PATHCOMPONENT", "false", self.str_to_bool
-            ),
-        }
-
-        self.fetch_env()
-        self.validate_settings()
-
-    def fetch_env(self) -> None:
-        self.env: Dict[str, str] = {}
-        for key, keyrel in self.keys_and_defaults.items():
-            val = os.getenv(keyrel.envvar, keyrel.default)
-            if val == "":
-                val = keyrel.default
-            self.env[key] = val
-
-    def validate_settings(self) -> None:
-        self.settings: Dict[str, SettingsUnion] = {}
-        for key in self.env:
-            self.settings[key] = self.keys_and_defaults[key].validator(
-                key, self.env[key]
-            )
         if LOGGER.isEnabledFor(logging.DEBUG):
-            LOGGER.debug("Loaded settings:\n%s", pprint.pformat(self.settings))
+            props = [
+                att
+                for att in dir(self.__class__)
+                if isinstance(getattr(self.__class__, att), property)
+            ]
+            settings = {p: getattr(self, p) for p in props}
+            LOGGER.debug("Loaded settings:\n%s", pprint.pformat(settings))
 
-    def noop_validator(self, key: str, val: str) -> str:
-        return val
-
-    def str_to_bool(self, key: str, val: str) -> bool:
+    @classmethod
+    def _str_to_bool(cls, envvar: str, val: str) -> bool:
         truthy = ("true", "yes", "1")
         falsey = ("false", "no", "0")
         if val.lower() in truthy:
@@ -78,25 +39,89 @@ class _Settings:
             return False
         LOGGER.critical(
             "Could not parse variable %s with value %s as boolean",
-            self.keys_and_defaults[key][0],
+            envvar,
             val,
         )
         raise ValueError("Could not parse value to boolean")
 
-    def str_to_int(self, key: str, val: str) -> int:
+    @classmethod
+    def _str_to_int(cls, envvar: str, val: str) -> int:
         try:
             return int(val)
         except ValueError:
             LOGGER.critical(
                 "Could not parse variable %s with value %s as integer",
-                self.keys_and_defaults[key][0],
+                envvar,
                 val,
             )
             raise ValueError("Could not parse value to integer")
 
+    def _set_and_get_prop(
+        self, name: str, envvar: str, default: T, validator: Optional[ValidatorCallable]
+    ) -> T:
+        try:
+            return getattr(self, name)
+        except AttributeError:
+            envval = os.getenv(envvar)
+            if envval is None:
+                val: T = default
+            else:
+                if validator:
+                    val = validator(envvar, envval)
+                else:
+                    val = typing.cast(T, envval)
+            setattr(self, name, val)
+            return val
 
-_settings = _Settings()
+    @property
+    def api_root_path(self) -> str:
+        return self._set_and_get_prop("_api_root_path", "API_ROOT_PATH", "", None)
+
+    @property
+    def source_address(self) -> str:
+        return self._set_and_get_prop("_source_address", "APISOURCE_ADDR", "", None)
+
+    @property
+    def source_port(self) -> int:
+        return self._set_and_get_prop(
+            "_source_port", "APISOURCE_PORT", 0, self._str_to_int
+        )
+
+    @property
+    def connection_timeout(self) -> int:
+        return self._set_and_get_prop(
+            "_connection_timeout", "CONNECTION_TIMEOUT", 5, self._str_to_int
+        )
+
+    @property
+    def connection_keepalive(self) -> int:
+        return self._set_and_get_prop(
+            "_connection_keepalive", "CONNECTION_KEEPALIVE", 30, self._str_to_int
+        )
+
+    @property
+    def show_username(self) -> bool:
+        return self._set_and_get_prop(
+            "_show_username", "SHOW_USERNAME", False, self._str_to_bool
+        )
+
+    @property
+    def show_password(self) -> bool:
+        return self._set_and_get_prop(
+            "_show_password", "SHOW_PASSWORD", False, self._str_to_bool
+        )
+
+    @property
+    def show_workername(self) -> bool:
+        return self._set_and_get_prop(
+            "_show_workername", "SHOW_WORKERNAME", False, self._str_to_bool
+        )
+
+    @property
+    def show_pathcomponent(self) -> bool:
+        return self._set_and_get_prop(
+            "_show_pathcomponent", "SHOW_PATHCOMPONENT", False, self._str_to_bool
+        )
 
 
-def __getattr__(name: str) -> SettingsUnion:
-    return _settings.settings[name]
+settings = _Settings()

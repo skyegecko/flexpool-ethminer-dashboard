@@ -9,7 +9,7 @@ import random
 
 from typing import Optional
 
-import api.settings
+from api.settings import settings
 
 LOGGER = logging.getLogger(__name__)
 
@@ -20,8 +20,8 @@ class Source:
     """
 
     def __init__(self):
-        self.address = api.settings.source_address
-        self.port = api.settings.source_port
+        self.address = settings.source_address
+        self.port = settings.source_port
 
     @classmethod
     def generate_id(cls) -> int:

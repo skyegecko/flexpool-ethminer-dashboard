@@ -2,12 +2,13 @@ import logging
 
 from fastapi import FastAPI
 
+from api.settings import settings
 from api.sourceconnection import Source
 
 
 LOGGER = logging.getLogger(__name__)
 
-app = FastAPI()
+app = FastAPI(root_path=settings.api_root_path)
 
 source = Source()
 
