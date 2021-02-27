@@ -9,4 +9,4 @@ services:
       - "13500:8000"
     volumes:
       - "./api/api:/app/api"
-    env_file: api/settings.env
+    env_file: settings.env
