@@ -6,7 +6,7 @@ import asyncio
 import json
 import logging
 import random
-from typing import NamedTuple, Optional
+from typing import Any, Mapping, NamedTuple, Optional
 
 from api.settings import settings
 
@@ -23,11 +23,11 @@ class Source:
     Class for setting up connections to source data provider
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.address: str = settings.source_address
         self.port: int = settings.source_port
-        self.connection: Connection = None
-        self.close_task: asyncio.Task = None
+        self.connection: Optional[Connection] = None
+        self.close_task: Optional[asyncio.Task] = None          # type: ignore
 
     @classmethod
     def generate_id(cls) -> int:
@@ -58,7 +58,7 @@ class Source:
                 )
             )
 
-        self.close_task = asyncio.Task(self.sleep_and_close())
+        self.close_task = asyncio.create_task(self.sleep_and_close())
 
     async def sleep_and_close(self) -> None:
         """
@@ -74,7 +74,7 @@ class Source:
                 "Connection closed after %s seconds", settings.connection_keepalive
             )
 
-    async def command(self, method: str, params: Optional[dict] = None) -> dict:
+    async def command(self, method: str) -> Mapping[str, Any]:
         """
         Open a connection to the source on a TCP socket and send `payload` as a
         JSON-encoded string. Await the JSON-encoded response and return that as
@@ -82,10 +82,9 @@ class Source:
         """
         payload = {"id": self.generate_id(), "jsonrpc": "2.0"}
         payload["method"] = method
-        if params is not None:
-            payload["params"] = params
 
         await self.connect()
+        assert self.connection is not None
 
         json_payload = json.dumps(payload)
         LOGGER.debug("write: %s", json_payload)

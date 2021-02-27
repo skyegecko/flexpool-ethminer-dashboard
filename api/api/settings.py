@@ -57,7 +57,11 @@ class _Settings:
             raise ValueError("Could not parse value to integer")
 
     def _set_and_get_prop(
-        self, name: str, envvar: str, default: T, validator: Optional[ValidatorCallable]
+        self,
+        name: str,
+        envvar: str,
+        default: T,
+        validator: Optional[ValidatorCallable[T]],
     ) -> T:
         try:
             return getattr(self, name)
@@ -69,7 +73,7 @@ class _Settings:
                 if validator:
                     val = validator(envvar, envval)
                 else:
-                    val = typing.cast(T, envval)
+                    val = typing.cast(T, envval)  # typing: ignore
             setattr(self, name, val)
             return val
 

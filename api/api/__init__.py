@@ -4,7 +4,7 @@ import sys
 __version__ = '0.1.0'
 
 
-def setup_logging():
+def setup_logging() -> None:
     formatter = logging.Formatter(fmt="[%(asctime)s %(levelname)s]: %(message)s")
     handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(formatter)
