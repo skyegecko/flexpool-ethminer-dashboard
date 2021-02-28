@@ -283,39 +283,3 @@ class Filtered(BaseModel):
             if gsd.monitors
             else None,
         )
-
-
-def _convert_connection(conn: GSD.Connection) -> Connection:
-    pass
-
-
-def _convert_device(dev: GSD.Device) -> Device:
-    pass
-
-
-def _convert_host(host: GSD.Host) -> Host:
-    pass
-
-
-def _convert_mining(mining: GSD.Mining) -> Mining:
-    pass
-
-
-def _convert_monitors(monitors: GSD.Monitors) -> Monitors:
-    pass
-
-
-def convert_from_getstatdetail(gsd: GSD.GetStatDetail) -> Filtered:
-    connection = _convert_connection(gsd.connection)
-    devices = [_convert_device(d) for d in gsd.devices]
-    host = _convert_host(gsd.host)
-    mining = _convert_mining(gsd.mining)
-    monitors = _convert_monitors(gsd.monitors) if gsd.monitors else None
-
-    return Filtered(
-        connection=connection,
-        devices=devices,
-        host=host,
-        mining=mining,
-        monitors=monitors,
-    )
