@@ -1,0 +1,23 @@
+FROM node:alpine
+
+WORKDIR /app
+
+RUN \
+    mkdir node_modules && \
+    chown -R node:node /app
+
+USER node
+
+ENV PATH /app/node_modules/.bin:/home/node/local/bin:$PATH
+
+COPY --chown=node:node package.json package-lock.json ./
+
+RUN \
+    echo 'prefix=/home/node/.local/' > /home/node/.npmrc && \
+    mkdir /home/node/.local && \
+    npm install --no-save && \
+    npm install -g react-scripts
+
+COPY . ./
+
+CMD ["npm", "start"]

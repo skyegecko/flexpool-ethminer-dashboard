@@ -5,8 +5,20 @@ services:
     build:
       context: ./api
       dockerfile: Dockerfile.dev
+    expose:
+      - "13500"
     ports:
-      - "13500:8000"
+      - "13500:13500"
     volumes:
       - "./api/api:/app/api"
     env_file: settings.env
+
+  dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - "./dashboard:/app"
+      - "/app/node_modules"
