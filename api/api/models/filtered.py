@@ -191,7 +191,7 @@ class Device(BaseModel):
     temp_c: Decimal
     fan_speed_perc: Decimal
     power_w: Decimal
-    hashrate_khs: int
+    hashrate: int
     paused: bool
     pause_reason: Optional[str]
     shares: Shares
@@ -214,7 +214,7 @@ class Device(BaseModel):
             temp_c=temp,
             fan_speed_perc=fan,
             power_w=power,
-            hashrate_khs=hashrate,
+            hashrate=hashrate,
             paused=mining.paused,
             pause_reason=mining.pause_reason,
             shares=shares,
@@ -239,7 +239,7 @@ class Mining(BaseModel):
     difficulty: int
     epoch: int
     epoch_changes: int
-    hashrate_khs: int
+    hashrate: int
     shares: Shares
 
     @classmethod
@@ -248,7 +248,7 @@ class Mining(BaseModel):
             difficulty=mining.difficulty,
             epoch=mining.epoch,
             epoch_changes=mining.epoch_changes,
-            hashrate_khs=int(mining.hashrate, 16),
+            hashrate=int(mining.hashrate, 16),
             shares=Shares.construct_from_gsd(mining.shares),
         )
 
