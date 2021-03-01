@@ -1,4 +1,5 @@
 import React from 'react';
+import {BasicWidget, HashrateDialWidget} from './Widgets.js';
 import logo from './logo.svg';
 import './App.css';
 
@@ -10,9 +11,17 @@ class App extends React.Component {
       isLoaded: false,
       apidata: {}
     };
+
+    this.reloadData = this.reloadData.bind(this);
   }
 
-  componentDidMount() {
+  componentWillMount() {
+    this.reloadData();
+
+    //setInterval(this.reloadData, 5000);
+  }
+
+  reloadData() {
     fetch("/api/")
       .then(res => res.json())
       .then(
@@ -34,38 +43,44 @@ class App extends React.Component {
   render() {
     const {error, isLoaded, apidata} = this.state;
 
-      return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <ApiDataTest error={error} isLoaded={isLoaded} apidata={apidata} />
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-      );
+    return (
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <Dashboard error={error} isLoaded={isLoaded} apidata={apidata} />
+        <a
+          className="App-link"
+          href="https://reactjs.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn React
+        </a>
+      </header>
+    </div>
+    );
   }
 }
 
-class ApiDataTest extends React.Component {
+class Dashboard extends React.Component {
   constructor(props) {
     super(props);
   }
 
   render() {
     if (this.props.error) {
-      return <p>Error: {this.props.error.message}</p>;
+      return <div>Error: {this.props.error.message}</div>;
     } else if (!this.props.isLoaded) {
-      return <p>Loading...</p>;
+      return <div>Loading...</div>;
     }
     else {
-      return <p>{JSON.stringify(this.props.apidata)}</p>
+      return (
+        <div>
+          <HashrateDialWidget
+            hashrate={this.props.apidata.mining.hashrate}
+          />
+        </div>
+      );
     }
   }
 }
