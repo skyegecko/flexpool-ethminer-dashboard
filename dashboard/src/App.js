@@ -1,6 +1,6 @@
 import React from 'react';
-import {TopBarWidget, HashrateDialWidget} from './Widgets.js';
 import './App.css';
+import Dashboard from './layouts/Dashboard.js';
 
 class App extends React.Component {
   constructor(props) {
@@ -57,47 +57,5 @@ class App extends React.Component {
   }
 }
 
-class Dashboard extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    if (this.props.error) {
-      return <div>Error: {this.props.error.message}</div>;
-    } else if (!this.props.isLoaded) {
-      return <div>Loading...</div>;
-    }
-    else {
-      return (
-        <div className="Dashboard">
-          <TopBarWidget
-            worker={this.props.apidata.connection.worker}
-            server={this.props.apidata.connection.server}
-            port={this.props.apidata.connection.port}
-            uptime={this.props.apidata.host.runtime_s}
-          />
-          <DashboardBody apidata={this.props.apidata} />
-        </div>
-      );
-    }
-  }
-}
-
-class DashboardBody extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    return (
-      <div className="DashboardBody">
-        <HashrateDialWidget
-          hashrate={this.props.apidata.mining.hashrate}
-        />
-      </div>
-    );
-  }
-}
 
 export default App;

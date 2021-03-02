@@ -1,16 +1,6 @@
 import humanizeDuration from 'humanize-duration';
 import React from 'react';
 
-class BasicWidget extends React.Component {
-  render() {
-    return (
-      <div className="BasicWidget">
-        <p><strong>{this.props.name}:</strong> {this.props.value}</p>
-      </div>
-    );
-  }
-}
-
 class TopBarWidget extends React.Component {
   constructor(props) {
     super(props);
@@ -36,6 +26,17 @@ class TopBarWidget extends React.Component {
       },
     });
   }
+  prettifyUptime(uptime) {
+    return humanizeDuration(
+      uptime * 1000, {
+        largest: 3,
+        units: ["d", "h", "m", "s"],
+        round: true,
+        delimiter: "",
+        spacer: "",
+      }
+    );
+  }
 
   render() {
     const worker = this.props.worker;
@@ -53,25 +54,4 @@ class TopBarWidget extends React.Component {
   }
 }
 
-class HashrateDialWidget extends React.Component {
-  formatHashrate(hashrate) {
-    return (hashrate / 1000000).toPrecision(3);
-  }
-
-  render() {
-    const hashrate = this.formatHashrate(this.props.hashrate)
-    return (
-      <div className="HashrateDialWidget">
-        <div className="dial">
-        </div>
-        <div className="hashratetext">
-          {hashrate}
-        </div>
-        <div className="hashrateunits">MH/s
-        </div>
-      </div>
-    );
-  }
-}
-
-export {BasicWidget, HashrateDialWidget, TopBarWidget};
+export default TopBarWidget;
