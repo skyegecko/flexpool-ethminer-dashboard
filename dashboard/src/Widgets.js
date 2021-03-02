@@ -1,3 +1,4 @@
+import humanizeDuration from 'humanize-duration';
 import React from 'react';
 
 class BasicWidget extends React.Component {
@@ -10,10 +11,62 @@ class BasicWidget extends React.Component {
   }
 }
 
+class TopBarWidget extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.humanizeUptime = humanizeDuration.humanizer({
+      largest: 3,
+      units: ["d", "h", "m", "s"],
+      round: true,
+      delimiter: "",
+      spacer: "",
+      language: "shortEn",
+      languages: {
+        shortEn: {
+          y: () => "y",
+          mo: () => "mo",
+          w: () => "w",
+          d: () => "d",
+          h: () => "h",
+          m: () => "m",
+          s: () => "s",
+          ms: () => "ms",
+        },
+      },
+    });
+  }
+  prettifyUptime(uptime) {
+    return humanizeDuration(
+      uptime * 1000, {
+        largest: 3,
+        units: ["d", "h", "m", "s"],
+        round: true,
+        delimiter: "",
+        spacer: "",
+      }
+    );
+  }
+
+  render() {
+    const worker = this.props.worker;
+    const server = this.props.server;
+    const port = this.props.port;
+    const uptimeStr = this.humanizeUptime(this.props.uptime * 1000);
+
+    return (
+      <div className="TopBarWidget">
+        <div className="worker">{worker}</div>
+        <div className="server">{server}:{port}</div>
+        <div className="uptime">Uptime: {uptimeStr}</div>
+      </div>
+    );
+  }
+}
+
 class HashrateDialWidget extends React.Component {
   formatHashrate(hashrate) {
-    const rounded = Math.round(hashrate / 10000)
-    return rounded / 100
+    return (hashrate / 1000000).toPrecision(3);
   }
 
   render() {
@@ -22,15 +75,14 @@ class HashrateDialWidget extends React.Component {
       <div className="HashrateDialWidget">
         <div className="dial">
         </div>
-        <div className="hashrate">
-          <strong>{hashrate}</strong><br />MH/s
+        <div className="hashratetext">
+          {hashrate}
         </div>
-        <div className="subtitle">
-          Hashrate
+        <div className="hashrateunits">MH/s
         </div>
       </div>
     );
   }
 }
 
-export {BasicWidget, HashrateDialWidget};
+export {BasicWidget, HashrateDialWidget, TopBarWidget};

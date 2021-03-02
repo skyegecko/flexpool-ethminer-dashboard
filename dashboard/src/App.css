@@ -1,13 +1,4 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-.App-header {
+body {
   background-color: #282c34;
   min-height: 100vh;
   display: flex;
@@ -18,6 +9,57 @@
   color: white;
 }
 
+.App {
+  text-align: center;
+}
+
 .App-link {
   color: #61dafb;
+}
+
+
+.TopBarWidget {
+  width: 80vw;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.TopBarWidget div {
+  flex-basis: 1em;
+  flex-grow: 1;
+  font-size: 0.7rem;
+}
+.TopBarWidget .worker {
+  text-align: left;
+}
+.TopBarWidget .server {
+  text-align: center;
+}
+.TopBarWidget .uptime {
+  text-align: right;
+}
+
+
+.DashboardBody {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+
+.HashrateDialWidget {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.HashrateDialWidget div.hashratetext {
+  font-size: 4rem;
+  font-weight: bold;
+}
+.HashrateDialWidget div.hashrateunits {
+  font-size: 1.8rem;
+  font-weight: lighter;
+  margin-top: -15px;
 }

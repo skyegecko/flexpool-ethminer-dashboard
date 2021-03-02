@@ -1,6 +1,5 @@
 import React from 'react';
-import {BasicWidget, HashrateDialWidget} from './Widgets.js';
-import logo from './logo.svg';
+import {TopBarWidget, HashrateDialWidget} from './Widgets.js';
 import './App.css';
 
 class App extends React.Component {
@@ -9,16 +8,23 @@ class App extends React.Component {
     this.state = {
       error: null,
       isLoaded: false,
-      apidata: {}
+      apidata: {},
+      refreshTimer: null,
     };
 
     this.reloadData = this.reloadData.bind(this);
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.reloadData();
 
-    //setInterval(this.reloadData, 5000);
+    const refreshTimer = setInterval(this.reloadData, 5000);
+    this.setState({refreshTimer: refreshTimer})
+  }
+
+  componentWillUnmount() {
+    const refreshTimer = this.state.refreshTimer;
+    clearInterval(refreshTimer);
   }
 
   reloadData() {
@@ -45,18 +51,7 @@ class App extends React.Component {
 
     return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Dashboard error={error} isLoaded={isLoaded} apidata={apidata} />
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Dashboard error={error} isLoaded={isLoaded} apidata={apidata} />
     </div>
     );
   }
@@ -75,13 +70,33 @@ class Dashboard extends React.Component {
     }
     else {
       return (
-        <div>
-          <HashrateDialWidget
-            hashrate={this.props.apidata.mining.hashrate}
+        <div className="Dashboard">
+          <TopBarWidget
+            worker={this.props.apidata.connection.worker}
+            server={this.props.apidata.connection.server}
+            port={this.props.apidata.connection.port}
+            uptime={this.props.apidata.host.runtime_s}
           />
+          <DashboardBody apidata={this.props.apidata} />
         </div>
       );
     }
+  }
+}
+
+class DashboardBody extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return (
+      <div className="DashboardBody">
+        <HashrateDialWidget
+          hashrate={this.props.apidata.mining.hashrate}
+        />
+      </div>
+    );
   }
 }
 
