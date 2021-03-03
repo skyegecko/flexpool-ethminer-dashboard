@@ -35,6 +35,7 @@ class App extends React.Component {
           this.setState({
             isLoaded: true,
             apidata: result,
+            error: null,
           });
         },
         (error) => {

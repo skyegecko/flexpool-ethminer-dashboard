@@ -67,12 +67,18 @@ class Source:
         """
         await asyncio.sleep(settings.connection_keepalive)
 
+        self.close()
+        LOGGER.info(
+            "Connection closed after %s seconds", settings.connection_keepalive
+        )
+
+    async def close(self) -> None:
+        """
+        Close an open connection to the source
+        """
         if self.connection is not None:
             self.connection.writer.close()
             await self.connection.writer.wait_closed()
-            LOGGER.info(
-                "Connection closed after %s seconds", settings.connection_keepalive
-            )
 
     async def command(self, method: str) -> Mapping[str, Any]:
         """
@@ -90,14 +96,18 @@ class Source:
         LOGGER.debug("write: %s", json_payload)
         json_payload = json_payload + "\n"
 
-        self.connection.writer.write(json_payload.encode())
-        await asyncio.wait_for(
-            self.connection.writer.drain(), timeout=settings.connection_timeout
-        )
+        try:
+            self.connection.writer.write(json_payload.encode())
+            await asyncio.wait_for(
+                self.connection.writer.drain(), timeout=settings.connection_timeout
+            )
 
-        response_b = await asyncio.wait_for(
-            self.connection.reader.readline(), timeout=settings.connection_timeout
-        )
+            response_b = await asyncio.wait_for(
+                self.connection.reader.readline(), timeout=settings.connection_timeout
+            )
+        except asyncio.exception.TimeoutError:
+            self.close()
+            raise
         response = response_b.decode()
         LOGGER.debug("read: %s", response.strip())
 
