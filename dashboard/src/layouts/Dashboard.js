@@ -1,6 +1,8 @@
 import React from 'react';
 import TopBarWidget from '../widgets/TopBarWidget.js';
 import HashrateDialWidget from '../widgets/HashrateDialWidget.js';
+import Device from './Device.js';
+import ShareStats from './ShareStats.js';
 
 class Dashboard extends React.Component {
   render() {
@@ -33,6 +35,8 @@ class DashboardBody extends React.Component {
         <HashrateDialWidget
           hashrate={this.props.apidata.mining.hashrate}
         />
+        <Device deviceData={this.props.apidata.devices[0]} />
+        <ShareStats shares={this.props.apidata.mining.shares} />
       </div>
     );
   }
