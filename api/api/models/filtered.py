@@ -147,6 +147,7 @@ class Connection(BaseModel):
     @classmethod
     def construct_from_gsd(cls, conn: GSD.Connection) -> Connection:
         scheme, _, protocol = conn.uri.scheme.partition("+")
+        protocol = protocol if protocol else None
         user: Optional[str] = None
         worker: Optional[str] = None
         if conn.uri.user:
