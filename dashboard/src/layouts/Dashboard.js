@@ -36,7 +36,7 @@ class DashboardBody extends React.Component {
           hashrate={this.props.apidata.mining.hashrate}
         />
         <Device deviceData={this.props.apidata.devices[0]} />
-        <ShareStats shares={this.props.apidata.mining.shares} />
+        <ShareStats mining={this.props.apidata.mining} />
       </div>
     );
   }
