@@ -152,6 +152,7 @@ class Connection(BaseModel):
         worker: Optional[str] = None
         if conn.uri.user:
             user, _, worker = conn.uri.user.partition(".")
+            worker = worker if worker else None
 
         port = int(conn.uri.port) if conn.uri.port else None
 
