@@ -3,7 +3,7 @@ import React from 'react';
 class ShareSinceLastLine extends React.Component {
   calcHighlight(timeSince, difficulty, hashrate) {
     const expectedTime = difficulty / hashrate;
-    const badTime = expectedTime * 1.5;
+    const badTime = expectedTime * 2;
 
     if (timeSince <= expectedTime) return "good";
     else if (timeSince <= badTime) return "poor";
@@ -15,7 +15,6 @@ class ShareSinceLastLine extends React.Component {
     const difficulty = this.props.difficulty;
     const hashrate = this.props.hashrate;
     const highlightClass = this.calcHighlight(value, difficulty, hashrate);
-    const expectedTime = difficulty / hashrate;
 
     return (
       <div className="ShareStatLine ShareSinceLastLine">
